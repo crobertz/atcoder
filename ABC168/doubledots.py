@@ -9,42 +9,29 @@ for _ in range(M):
     graph[B].add(A)
 
 to_visit = set(range(2,N+1))
-current_level = {1}
-to_visit = to_visit - current_level
 level = 0
-levels = {0:{1}}
-seen = {1}
+
+posts = {}
 
 while to_visit:
-    level += 1
-    next_level = set()
-    for i in current_level:
-        next_level = next_level.union(graph[i] & to_visit)
+    # base
+    if level == 0:
+        levels = {0:{1:None}}
+        current_level = {1}
     
-    levels[level] = next_level    
-    current_level = next_level
-    to_visit = to_visit - current_level
+    # loop
+    else:
+        prevs = levels[level-1]
+        levels[level] = {}
+        for prev in prevs:
+            for nbr in graph[prev]:
+                if nbr in to_visit:
+                    levels[level][nbr] = prev
+                    posts[nbr] = prev
+                    to_visit.remove(nbr) 
+    
+    level += 1
 
-prevs = {}
-for level in reversed(range(1,len(levels))):
-    for node in levels[level]:
-        prevs[node] = set()
-        for nbr in graph[node]:
-            if nbr in levels[level-1]:
-                prevs[node].add(nbr)
-
-# print(prevs)
-
-posts = {1:1}
-
-for level in range(1,len(levels)):
-    for node in levels[level]:
-        for prev in prevs[node]:
-            if prev in posts:
-                posts[node] = prev
-                break
-
-# print(posts)
-
-for i in range(2, N+1):
+print('Yes')
+for i in range(2,N+1):
     print(posts[i])
